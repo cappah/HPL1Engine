@@ -8,6 +8,8 @@ include_directories(
 	${CMAKE_CURRENT_SOURCE_DIR}/include
 	${CMAKE_CURRENT_SOURCE_DIR}/../OALWrapper/include
 	${CMAKE_CURRENT_SOURCE_DIR}/../dependencies/include
+	${CMAKE_CURRENT_SOURCE_DIR}/../dependencies/Cg/include
+	${CMAKE_CURRENT_SOURCE_DIR}/../dependencies/angelscript-sdk/angelscript/include
 )
 file(GLOB_RECURSE all_sources
     ${CMAKE_CURRENT_SOURCE_DIR}/sources/*.cpp
@@ -16,11 +18,19 @@ file(GLOB_RECURSE all_sources
 # Removed Sources
 file(GLOB_RECURSE to_remove_all
     win32.cpp
+    posix.cpp
     Video*Theora.cpp
     )
 list(REMOVE_ITEM all_sources
     ${to_remove_all})
 list(REMOVE_DUPLICATES all_sources)
+
+if (WIN32)
+	list(APPEND all_sources ${CMAKE_CURRENT_SOURCE_DIR}/sources/impl/platform/win32.cpp)
+	add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+elseif (UNIX)
+	list(APPEND all_sources ${CMAKE_CURRENT_SOURCE_DIR}/sources/impl/platform/posix.cpp)
+endif ()
 
 add_library(HPL STATIC ${all_sources})
 
